@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+	<html>
+		<head>
+			<title>My games</title>
+		</head>
+		<body>
+			<h1>My games webpage</h1>
+			{{ include('navigation.html') }}
+			<p>{{ num_rows }} record(s) were returned...</p>
+			<table border=1>
+				{% for item in results %}
+				<tr>
+				<td>{{ item.game_name }}</td>
+				<td>{{ item.released_date }}</td>
+				</tr>
+				{% endfor %}
+			</table>
+		</body>
+	</html>
