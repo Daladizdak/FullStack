@@ -1,37 +1,102 @@
 <!doctype html>
-	<html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-	</head>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>My Movies</title>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
 
-	<body>
-		<div class="container">
-			<h1 class="text-center">List of ALL my movies!!!</h1>
+<body>
+	<div class="container mt-4">
+		<h1 class="mb-4">List of ALL my movies!!!</h1>
 
-			<table class="table">
-				<thead>
-					<tr>
-						<th>Movie Name</th>
-						<th>Genre</th>
-						<th>Price</th>
-						<th>Date for release</th>
-					</tr>
-				</thead>
-
-				<tbody>
-					{% for movie in movies %}
-						<tr>
-							<td>{{ movie.Movie_name }}</td>
-							<td>{{ movie.Genre }}</td>
-							<td>£{{ movie.Price|number_format(2, '.', ',') }}</td>
-							<td>{{ movie['Date for release'] }}</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
-	
+		
+		<div class="row mb-3">
+			<div class="col-md-4">
+				<input 
+					type="text" 
+					class="form-control" 
+					id="searchBox" 
+					placeholder="Search by movie name or genre">
+			</div>
 		</div>
-	</body>
+
+		<table class="table table-striped">
+			<thead>
+				<tr>
+					<th>Movie Name</th>
+					<th>Genre</th>
+					<th>Price</th>
+					<th>Date for release</th>
+				</tr>
+			</thead>
+
+			<tbody id="movieTableBody">
+				{# initial list from PHP #}
+				{% for movie in movies %}
+					<tr>
+						<td>{{ movie.Movie_name }}</td>
+						<td>{{ movie.Genre }}</td>
+						<td>£{{ movie.Price|number_format(2, '.', ',') }}</td>
+						<td>{{ movie['Date for release'] }}</td>
+					</tr>
+				{% endfor %}
+			</tbody>
+		</table>
+
+		<p id="noResultsMessage" class="text-muted" style="display:none;">No movies found.</p>
+	</div>
+
+	<script>
+		// Wait until the page is loaded so elements exist
+		document.addEventListener('DOMContentLoaded', () => {
+			const searchBox = document.getElementById("searchBox");
+			const tableBody = document.getElementById("movieTableBody");
+			const noResultsMessage = document.getElementById("noResultsMessage");
+
+			if (!searchBox) {
+				console.error('Search box not found');
+				return;
+			}
+
+			searchBox.addEventListener("keyup", doSearch);
+
+			function doSearch() {
+				const keywords = searchBox.value;
+
+				// Debug line so you can see it's running
+				console.log("Searching for:", keywords);
+
+				fetch('search_movies.php?search=' + encodeURIComponent(keywords))
+					.then(response => response.json())
+					.then(movies => {
+						// Clear table
+						tableBody.innerHTML = '';
+
+						if (!Array.isArray(movies) || movies.length === 0) {
+							noResultsMessage.style.display = 'block';
+							return;
+						} else {
+							noResultsMessage.style.display = 'none';
+						}
+
+						movies.forEach(movie => {
+							const row = document.createElement('tr');
+							row.innerHTML = `
+								<td>${movie.Movie_name}</td>
+								<td>${movie.Genre}</td>
+								<td>£${parseFloat(movie.Price).toFixed(2)}</td>
+								<td>${movie['Date for release']}</td>
+							`;
+							tableBody.appendChild(row);
+						});
+					})
+					.catch(error => {
+						console.error('Search error:', error);
+					});
+			}
+		});
+	</script>
+</body>
 </html>
