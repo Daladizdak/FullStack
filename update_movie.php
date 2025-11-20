@@ -1,20 +1,27 @@
 <?php
 header('Content-Type: application/json');
 
-include("db.php");
+require_once __DIR__ . '/db.php';
 
+$id          = isset($_POST['Movie_id']) ? (int)$_POST['Movie_id'] : 0;
 $movieName   = trim($_POST['MovieName']   ?? '');
 $genre       = trim($_POST['Genre']       ?? '');
 $releaseDate = trim($_POST['ReleaseDate'] ?? '');
 $score       = trim($_POST['Score']       ?? '');
+
+if ($id <= 0) {
+    echo json_encode(['success' => false, 'error' => 'Invalid movie ID.']);
+    exit;
+}
 
 if ($movieName === '' || $genre === '' || $releaseDate === '' || $score === '') {
     echo json_encode(['success' => false, 'error' => 'All fields are required.']);
     exit;
 }
 
-$sql = "INSERT INTO films (Movie_name, Genre, Release_Date, Score)
-        VALUES (?, ?, ?, ?)";
+$sql = "UPDATE films
+        SET Movie_name = ?, Genre = ?, Release_Date = ?, Score = ?
+        WHERE Movie_id = ?";
 
 $stmt = mysqli_prepare($mysqli, $sql);
 
@@ -23,27 +30,27 @@ if (!$stmt) {
     exit;
 }
 
-mysqli_stmt_bind_param($stmt, 'sssi', 
-    $movieName, 
-    $genre, 
-    $releaseDate, 
-    $score
+mysqli_stmt_bind_param($stmt, 'sssii',
+    $movieName,
+    $genre,
+    $releaseDate,
+    $score,
+    $id
 );
 
 if (mysqli_stmt_execute($stmt)) {
-    $newId = mysqli_insert_id($mysqli);
     echo json_encode([
         'success' => true,
         'movie' => [
-            'Movie_id' => $newId,
-            'Movie_name' => $movieName,
-            'Genre' => $genre,
+            'Movie_id'     => $id,
+            'Movie_name'   => $movieName,
+            'Genre'        => $genre,
             'Release_Date' => $releaseDate,
-            'Score' => (int)$score
+            'Score'        => (int)$score
         ]
     ]);
 } else {
-    echo json_encode(['success' => false, 'error' => 'Insert failed.']);
+    echo json_encode(['success' => false, 'error' => 'Update failed.']);
 }
 
 mysqli_stmt_close($stmt);
