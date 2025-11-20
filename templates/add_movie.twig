@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Add a Movie</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+          crossorigin="anonymous">
+</head>
+<body>
+<div class="container">
+    <h1>Add a Movie</h1>
+
+    {% if success is defined and success %}
+        <div class="alert alert-success">Movie added successfully!</div>
+    {% endif %}
+
+    <form action="add_movie.php" method="post">
+
+        <div class="mb-3">
+            <label for="MovieName" class="form-label">Movie name</label>
+            <input type="text" class="form-control" id="MovieName" name="MovieName">
+        </div>
+
+        <div class="mb-3">
+            <label for="Genre" class="form-label">Genre</label>
+            <input type="text" class="form-control" id="Genre" name="Genre">
+        </div>
+
+        <div class="mb-3">
+            <label for="ReleaseDate" class="form-label">Release date</label>
+            <input type="date" class="form-control" id="ReleaseDate" name="ReleaseDate">
+        </div>
+
+        <div class="mb-3">
+            <label for="Score" class="form-label">Score</label>
+            <input type="number" class="form-control" id="Score" name="Score">
+        </div>
+
+        <input type="submit" class="btn btn-primary" value="Add movie">
+    </form>
+</div>
+</body>
+</html>

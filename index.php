@@ -5,7 +5,7 @@
 	include("db.php");
 
 	// Query movies 
-	$query  = "SELECT * FROM movies ORDER BY Movie_name";
+	$query  = "SELECT * FROM films ORDER BY Movie_name";
 	$result = mysqli_query($mysqli, $query);
 
 	if (!$result) {
@@ -21,12 +21,14 @@
 	// Close connection
 	mysqli_close($mysqli);
 
+	$success = isset($_GET['success']) && $_GET['success'] == 1;
+
 	// Setup Twig
 	$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
 	$twig   = new \Twig\Environment($loader);
 
 	// Render Twig template
 	echo $twig->render('movies.twig', [
-		'movies' => $movies
+    	'movies' => $movies,
+    	'success' => $success
 	]);
-
