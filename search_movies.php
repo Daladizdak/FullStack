@@ -1,45 +1,69 @@
 <?php
-// search_movies.php
-header('Content-Type: application/json');
+	// search_movies.php
+	header('Content-Type: application/json');
 
-// Get search term from query string (e.g. ?search=abc)
-$search = $_GET['search'] ?? '';
-$search = trim($search);
+	// Get search term from query string (e.g. ?search=abc)
+	$search = isset($_GET['search']) ? trim($_GET['search']) : '';
 
-// Connect to MySQL
-$mysqli = new mysqli("localhost","2337117","Bioin150words","db2337117");
+	include("db.php");
 
-if ($mysqli->connect_errno) {
-    echo json_encode([]);
-    exit;
-}
+	//if the search box is empty, All movies will be displayed in order of their name
+	if ($search === '') {
+		$sql = "SELECT * FROM movies ORDER BY Movie_name";
+		$result = mysqli_query($mysqli, $sql);
 
-if ($search === '') {
-    // If no keyword typed, return ALL movies (same as index)
-    $sql = "SELECT * FROM movies ORDER BY Movie_name";
-    $stmt = $mysqli->prepare($sql);
-} else {
-    // Search by movie name or genre
-    $sql = "SELECT * FROM movies 
-            WHERE Movie_name LIKE ? 
-               OR Genre LIKE ?
-            ORDER BY Movie_name";
-    $stmt = $mysqli->prepare($sql);
+		if (!$result) {
+			echo json_encode([]);
+			mysqli_close($mysqli);
+			exit;
+		}
 
-    $like = '%' . $search . '%';
-    $stmt->bind_param('ss', $like, $like);
-}
+		$movies = [];
+		while ($row = mysqli_fetch_assoc($result)) {
+			$movies[] = $row;
+		}
 
-$stmt->execute();
-$result = $stmt->get_result();
+		mysqli_free_result($result);
+		mysqli_close($mysqli);
 
-$movies = [];
-while ($row = $result->fetch_assoc()) {
-    $movies[] = $row;
-}
+		echo json_encode($movies);
+		exit;
+	}
 
-$stmt->close();
-$mysqli->close();
+	// When there *is* a search term, use a prepared statement for more security
+	$sql = "SELECT * FROM movies 
+			WHERE Movie_name LIKE ?
+			ORDER BY Movie_name";
 
-// Send JSON back to the browser
-echo json_encode($movies);
+	$stmt = mysqli_prepare($mysqli, $sql);
+
+	if (!$stmt) {
+		echo json_encode([]);
+		mysqli_close($mysqli);
+		exit;
+	}
+
+	
+	$like = '%' . $search . '%';
+	mysqli_stmt_bind_param($stmt, 's', $like);
+
+	// Execute statement
+	mysqli_stmt_execute($stmt);
+
+	// Get result set
+	$result = mysqli_stmt_get_result($stmt);
+
+	$movies = [];
+	if ($result) {
+		while ($row = mysqli_fetch_assoc($result)) {
+			$movies[] = $row;
+		}
+		mysqli_free_result($result);
+	}
+
+	
+	mysqli_stmt_close($stmt);
+	mysqli_close($mysqli);
+
+	
+	echo json_encode($movies);

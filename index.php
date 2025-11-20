@@ -2,29 +2,31 @@
 
 	require_once __DIR__ . '/vendor/autoload.php';
 
-	// Connect to MySQL
-	$mysqli = new mysqli("localhost","2337117","Bioin150words","db2337117");
+	include("db.php");
 
-	if ($mysqli->connect_errno) {
-    		die("Failed to connect: " . $mysqli->connect_error);
+	// Query movies 
+	$query  = "SELECT * FROM movies ORDER BY Movie_name";
+	$result = mysqli_query($mysqli, $query);
+
+	if (!$result) {
+		die("Query error: " . mysqli_error($mysqli));
 	}
-
-	// Query movies
-	$query = "SELECT * FROM movies ORDER BY Movie_name"; 
-	$result = $mysqli->query($query);
 
 	// Convert result into array
 	$movies = [];
-	while ($row = $result->fetch_assoc()) {
-   		 $movies[] = $row;
+	while ($row = mysqli_fetch_assoc($result)) {
+		$movies[] = $row;
 	}
+
+	// Close connection
+	mysqli_close($mysqli);
 
 	// Setup Twig
 	$loader = new \Twig\Loader\FilesystemLoader(__DIR__ . '/templates');
-	$twig = new \Twig\Environment($loader);
+	$twig   = new \Twig\Environment($loader);
 
 	// Render Twig template
 	echo $twig->render('movies.twig', [
-    		'movies' => $movies
+		'movies' => $movies
 	]);
 
