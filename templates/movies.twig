@@ -54,20 +54,39 @@
 						<th>Genre</th>
 						<th>Release date</th>
 						<th>Score</th>
+						<th>Favourite</th>
 						<th>Adjust</th>
 					</tr>
 				</thead>
 
 				<tbody id="movieTableBody">
-					{# initial list from PHP #}
+					
 					{% for movie in movies %}
-					<tr id="movie-row-{{ movie.Movie_id }}">
-						<td>{{ movie.Movie_name }}</td>
-						<td>{{ movie.Genre }}</td>
-						<td>{{ movie.Release_Date }}</td>
-						<td>{{ movie.Score|number_format(0) }}/100</td>
-						<td>
-							<button
+						<tr id="movie-row-{{ movie.Movie_id }}">
+    						<td>
+        					{{ movie.Movie_name }}
+    						</td>
+    						<td>{{ movie.Genre }}</td>
+    						<td>{{ movie.Release_Date }}</td>
+    						<td class="movie-score">{{ movie.Score|number_format(0) }}/100</td>
+
+    						<td class="movie-fav">
+        					<button
+            					type="button"
+            					class="btn btn-link btn-sm p-0 btn-fav"
+            					data-id="{{ movie.Movie_id }}"
+            					data-fav="{{ movie.Favorite ?? 0 }}"
+        					>
+            					{% if movie.Favorite %}
+                				★
+            					{% else %}
+                				☆
+            					{% endif %}
+       			 			</button>
+    						</td>
+
+    						<td>
+        						<button
 								class="btn btn-sm btn-primary btn-edit"
 								data-id="{{ movie.Movie_id }}"
 								data-name="{{ movie.Movie_name }}"
@@ -76,22 +95,26 @@
 								data-score="{{ movie.Score }}">
 								Edit
 							</button>
+
 							<button
 								class="btn btn-sm btn-danger btn-delete"
 								data-id="{{ movie.Movie_id }}">
 								Delete
 							</button>
-						</td>
-					</tr>
+    						</td>
+						</tr>
 					{% endfor %}
+
 				</tbody>
 			</table>
 			
+			<p id="noResultsMessage" class="text-muted" style="display:none;">No movies found.</p>
+
 			<button type="button" class="btn btn-success mb-3" data-bs-toggle="modal" data-bs-target="#addMovieModal">
 				Add a Movie
 			</button>
 
-			<p id="noResultsMessage" class="text-muted" style="display:none;">No movies found.</p>
+			
 		</div>
 
 		{# Add Movie Modal #}
@@ -175,6 +198,8 @@
 		<script src="js/addMovie.js"></script>
 		<script src="js/editMovie.js"></script>
 		<script src="js/deleteMovie.js"></script>
+		<script src="js/favorite.js"></script>
+
 
 	</body>
 </html>
