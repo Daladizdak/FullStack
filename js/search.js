@@ -55,11 +55,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     const row = document.createElement('tr');
                     row.id = 'movie-row-' + movie.Movie_id;
 
+                   
+                    const fav  = movie.Favorite ? 1 : 0;
+                    const star = fav ? '★' : '☆';
+
                     row.innerHTML = `
                         <td>${movie.Movie_name}</td>
                         <td>${movie.Genre}</td>
                         <td>${movie.Release_Date}</td>
-                        <td>${parseInt(movie.Score)}/100</td>
+                        <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
+                        <td class="movie-fav">
+                            <button
+                                type="button"
+                                class="btn btn-link btn-sm p-0 btn-fav"
+                                data-id="${movie.Movie_id}"
+                                data-fav="${fav}"
+                            >
+                                ${star}
+                            </button>
+                        </td>
                         <td>
                             <button class="btn btn-sm btn-primary btn-edit"
                                 data-id="${movie.Movie_id}"
@@ -75,6 +89,7 @@ document.addEventListener('DOMContentLoaded', () => {
                             </button>
                         </td>
                     `;
+
                     tableBody.appendChild(row);
                 });
 

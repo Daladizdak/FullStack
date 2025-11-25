@@ -1,11 +1,11 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const addMovieForm = document.getElementById('addMovieForm');
-    const addError = document.getElementById('addError');
+    const addMovieForm    = document.getElementById('addMovieForm');
+    const addError        = document.getElementById('addError');
     const addMovieModalEl = document.getElementById('addMovieModal');
-    const addMovieModal = addMovieModalEl ? new bootstrap.Modal(addMovieModalEl) : null;
-    const tableBody = document.getElementById("movieTableBody");
+    const addMovieModal   = addMovieModalEl ? new bootstrap.Modal(addMovieModalEl) : null;
+    const tableBody       = document.getElementById("movieTableBody");
 
-    if (!addMovieForm) return;
+    if (!addMovieForm || !tableBody) return;
 
     addMovieForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -29,11 +29,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const row = document.createElement('tr');
                 row.id = 'movie-row-' + movie.Movie_id;
+
+                const fav  = movie.Favorite ? 1 : 0;
+                const star = fav ? '★' : '☆';
+
                 row.innerHTML = `
                     <td>${movie.Movie_name}</td>
                     <td>${movie.Genre}</td>
                     <td>${movie.Release_Date}</td>
-                    <td>${movie.Score}/100</td>
+                    <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
+                    <td class="movie-fav">
+                        <button
+                            type="button"
+                            class="btn btn-link btn-sm p-0 btn-fav"
+                            data-id="${movie.Movie_id}"
+                            data-fav="${fav}"
+                        >
+                            ${star}
+                        </button>
+                    </td>
                     <td>
                         <button class="btn btn-sm btn-primary btn-edit"
                             data-id="${movie.Movie_id}"
@@ -51,9 +65,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 `;
 
                 tableBody.appendChild(row);
+
+                
                 addMovieForm.reset();
-                addMovieModal.hide();
+                if (addMovieModal) addMovieModal.hide();
+
+               
+                showAddSuccessMessage();
             })
-            .catch(() => addError.textContent = 'Network error.');
+            .catch(() => {
+                addError.textContent = 'Network error.';
+            });
     });
+
+   
+    function showAddSuccessMessage() {
+        let msg = document.getElementById('successMessage');
+
+        // if it doesn't exist (because Twig didn't render it), create it
+        if (!msg) {
+            const container = document.querySelector('.container');
+            msg = document.createElement('div');
+            msg.id = 'successMessage';
+            msg.className = 'alert alert-success mt-2';
+            container.insertBefore(msg, container.children[1] || container.firstChild);
+        }
+
+        msg.textContent = 'Movie added successfully!';
+        msg.style.display = 'block';
+        msg.style.opacity = '1';
+
+        // fade out after 3 seconds
+        setTimeout(() => {
+            msg.style.transition = 'opacity 0.5s';
+            msg.style.opacity = '0';
+            setTimeout(() => {
+                msg.style.display = 'none';
+                msg.style.opacity = '1';
+            }, 500);
+        }, 3000);
+    }
 });

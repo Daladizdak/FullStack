@@ -11,23 +11,7 @@
 		<div class="container mt-4">
 			<h1 class="mb-4">Best Movies Of All time</h1>
 
-			{% if success %}
-			<div id="successMessage" class="alert alert-success">
-				Movie added successfully!
-			</div>
-
-			<script>
-				setTimeout(function() {
-				const msg = document.getElementById('successMessage');
-				if (msg) {
-				msg.style.transition = "opacity 0.5s";
-				msg.style.opacity = "0";
-				setTimeout(() => msg.remove(), 500);
-				}
-				}, 10000); // 10 seconds
-			</script>
-			{% endif %}
-
+			
 			<div class="row mb-3">
 				<div class="col-md-4">
 					<input
