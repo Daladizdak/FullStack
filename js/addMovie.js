@@ -29,6 +29,16 @@ addMovieModalEl.addEventListener("shown.bs.modal", () => {
         })
         .then(res => res.json())
         .then(data => {
+
+		if (data.error === 'You must be logged in') {
+    			alert('Please log in to perform this action.');
+   			 return;
+		}
+
+
+
+
+
             if (data.exists) {
                 duplicateWarning.textContent = '⚠ This movie already exists.';
                 submitButton.disabled = true;

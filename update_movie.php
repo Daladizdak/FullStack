@@ -2,6 +2,14 @@
 header('Content-Type: application/json');
 
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/session.php';
+
+if (empty($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'You must be logged in']);
+    exit;
+}
+
 
 $id          = isset($_POST['Movie_id']) ? (int)$_POST['Movie_id'] : 0;
 $movieName   = trim($_POST['MovieName']   ?? '');

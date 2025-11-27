@@ -39,6 +39,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(res => res.json())
             .then(data => {
+
+		if (data.error === 'You must be logged in') {
+    			alert('Please log in to perform this action.');
+   			 return;
+		}
+
+
                 if (!data.success) {
                     alert(data.error || 'Failed to update favourite.');
                     return;
@@ -48,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 btn.setAttribute('data-fav', data.favorite);
                 btn.textContent = data.favorite ? '★' : '☆';
 
-                // ⬇⬇ SORT AFTER UPDATE ⬇⬇
+             
                 sortTableByFavorite();
             })
             .catch(err => {

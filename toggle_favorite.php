@@ -2,6 +2,14 @@
 header('Content-Type: application/json');
 
 require_once 'db.php'; 
+require_once __DIR__ . '/session.php';
+
+if (empty($_SESSION['user_id'])) {
+    http_response_code(401);
+    echo json_encode(['success' => false, 'error' => 'You must be logged in']);
+    exit;
+}
+
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);

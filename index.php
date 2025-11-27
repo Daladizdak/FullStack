@@ -1,7 +1,7 @@
 <?php
 
+	require_once __DIR__ . '/session.php';
 	require_once __DIR__ . '/vendor/autoload.php';
-
 	include("db.php");
 
 	// Query movies 
@@ -30,5 +30,7 @@
 	// Render Twig template
 	echo $twig->render('movies.twig', [
     	'movies' => $movies,
-    	'success' => $success
+    	'success' => $success,
+	'loggedIn' => !empty($_SESSION['user_id']),
+	'username' => $_SESSION['username'] ?? null
 	]);

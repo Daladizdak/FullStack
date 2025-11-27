@@ -18,6 +18,13 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(res => res.json())
             .then(data => {
+
+		if (data.error === 'You must be logged in') {
+    			alert('Please log in to perform this action.');
+   			 return;
+		}
+
+
                 if (data.success) {
                     const row = document.getElementById('movie-row-' + id);
                     if (row) row.remove();

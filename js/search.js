@@ -56,39 +56,60 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.id = 'movie-row-' + movie.Movie_id;
 
                    
-                    const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
-                    const star = fav ? '★' : '☆';
+                   const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
+const star = fav ? '★' : '☆';
 
-                    row.innerHTML = `
-                        <td>${movie.Movie_name}</td>
-                        <td>${movie.Genre}</td>
-                        <td>${movie.Release_Date}</td>
-                        <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
-                        <td class="movie-fav">
-                            <button
-                                type="button"
-                                class="btn btn-link btn-sm p-0 btn-fav"
-                                data-id="${movie.Movie_id}"
-                                data-fav="${fav}"
-                            >
-                                ${star}
-                            </button>
-                        </td>
-                        <td>
-                            <button class="btn btn-sm btn-primary btn-edit"
-                                data-id="${movie.Movie_id}"
-                                data-name="${movie.Movie_name}"
-                                data-genre="${movie.Genre}"
-                                data-date="${movie.Release_Date}"
-                                data-score="${movie.Score}">
-                                Edit
-                            </button>
-                            <button class="btn btn-sm btn-danger btn-delete"
-                                data-id="${movie.Movie_id}">
-                                Delete
-                            </button>
-                        </td>
-                    `;
+// Favourite cell HTML depends on login
+let favCellHtml;
+if (typeof LOGGED_IN !== 'undefined' && LOGGED_IN) {
+    favCellHtml = `
+        <button
+            type="button"
+            class="btn btn-link btn-sm p-0 btn-fav"
+            data-id="${movie.Movie_id}"
+            data-fav="${fav}"
+        >
+            ${star}
+        </button>
+    `;
+} else {
+    favCellHtml = star; // just show the star, no button
+}
+
+// Adjust (edit/delete) column depends on login
+let adjustCellHtml;
+if (typeof LOGGED_IN !== 'undefined' && LOGGED_IN) {
+    adjustCellHtml = `
+        <button class="btn btn-sm btn-primary btn-edit"
+            data-id="${movie.Movie_id}"
+            data-name="${movie.Movie_name}"
+            data-genre="${movie.Genre}"
+            data-date="${movie.Release_Date}"
+            data-score="${movie.Score}">
+            Edit
+        </button>
+        <button class="btn btn-sm btn-danger btn-delete"
+            data-id="${movie.Movie_id}">
+            Delete
+        </button>
+    `;
+} else {
+    adjustCellHtml = `<span class="text-muted small">Login to edit</span>`;
+}
+
+row.innerHTML = `
+    <td>${movie.Movie_name}</td>
+    <td>${movie.Genre}</td>
+    <td>${movie.Release_Date}</td>
+    <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
+    <td class="movie-fav">
+        ${favCellHtml}
+    </td>
+    <td>
+        ${adjustCellHtml}
+    </td>
+`;
+
 
                     tableBody.appendChild(row);
                 });

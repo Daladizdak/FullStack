@@ -43,6 +43,14 @@ document.addEventListener('DOMContentLoaded', () => {
         })
             .then(res => res.json())
             .then(data => {
+
+			if (data.error === 'You must be logged in') {
+    			alert('Please log in to perform this action.');
+   			 return;
+		}
+
+
+
                 console.log("update_movie.php returned:", data);
 
                 if (!data.success) {
