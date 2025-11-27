@@ -32,6 +32,33 @@ if ($movieName === '' || $genre === '' || $releaseDate === '' || $score === '') 
     exit;
 }
 
+// check for duplicate movie name, excluding this movie's own row
+$checkSql = "SELECT COUNT(*) AS cnt 
+             FROM films 
+             WHERE Movie_name = ? AND Movie_id <> ?";
+
+$checkStmt = mysqli_prepare($mysqli, $checkSql);
+
+if (!$checkStmt) {
+    echo json_encode(['success' => false, 'error' => 'Database error.']);
+    exit;
+}
+
+mysqli_stmt_bind_param($checkStmt, 'si', $movieName, $id);
+mysqli_stmt_execute($checkStmt);
+$checkResult = mysqli_stmt_get_result($checkStmt);
+$row = $checkResult ? mysqli_fetch_assoc($checkResult) : null;
+mysqli_stmt_close($checkStmt);
+
+if ($row && (int)$row['cnt'] > 0) {
+    echo json_encode([
+        'success' => false,
+        'error'   => 'This movie name is already used by another movie.'
+    ]);
+    exit;
+}
+
+
 $sql = "UPDATE films
         SET Movie_name = ?, Genre = ?, Release_Date = ?, Score = ?
         WHERE Movie_id = ?";
