@@ -9,7 +9,7 @@
 
 	//if the search box is empty, All movies will be displayed in order of their name
 	if ($search === '') {
-		$sql = "SELECT * FROM films ORDER BY Movie_name";
+		$sql = "SELECT * FROM films ORDER BY Favorite DESC, Movie_name ASC";
 		$result = mysqli_query($mysqli, $sql);
 
 		if (!$result) {
@@ -33,7 +33,7 @@
 	// When there *is* a search term, use a prepared statement for more security
 	$sql = "SELECT * FROM films 
 			WHERE Movie_name LIKE ?
-			ORDER BY Movie_name";
+			ORDER BY Favorite DESC, Movie_name ASC";
 
 	$stmt = mysqli_prepare($mysqli, $sql);
 

@@ -26,6 +26,25 @@ if ($movieName === '' || $genre === '' || $releaseDate === '' || $score === '') 
     exit;
 }
 
+$checkSql = "SELECT COUNT(*) AS cnt FROM films WHERE Movie_name = ?";
+$checkStmt = mysqli_prepare($mysqli, $checkSql);
+
+if (!$checkStmt) {
+    echo json_encode(['success' => false, 'error' => 'Database error.']);
+    exit;
+}
+
+mysqli_stmt_bind_param($checkStmt, 's', $movieName);
+mysqli_stmt_execute($checkStmt);
+$checkResult = mysqli_stmt_get_result($checkStmt);
+$row = $checkResult ? mysqli_fetch_assoc($checkResult) : null;
+mysqli_stmt_close($checkStmt);
+
+if ($row && (int)$row['cnt'] > 0) {
+    echo json_encode(['success' => false, 'error' => 'This movie already exists in the database.']);
+    exit;
+}
+
 $sql = "INSERT INTO films (Movie_name, Genre, Release_Date, Score)
         VALUES (?, ?, ?, ?)";
 

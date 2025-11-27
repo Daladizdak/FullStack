@@ -2,10 +2,55 @@ document.addEventListener('DOMContentLoaded', () => {
     const addMovieForm    = document.getElementById('addMovieForm');
     const addError        = document.getElementById('addError');
     const addMovieModalEl = document.getElementById('addMovieModal');
+
+
+addMovieModalEl.addEventListener("shown.bs.modal", () => {
+
+    const movieNameInput   = document.getElementById('MovieName');
+    const duplicateWarning = document.getElementById('duplicateWarning');
+    const submitButton     = addMovieForm.querySelector('button[type="submit"]');
+
+    duplicateWarning.textContent = '';
+    submitButton.disabled = false;
+
+    movieNameInput.onkeyup = () => {
+        const name = movieNameInput.value.trim();
+
+        if (name.length < 2) {
+            duplicateWarning.textContent = '';
+            submitButton.disabled = false;
+            return;
+        }
+
+        fetch('check-movie.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'MovieName=' + encodeURIComponent(name)
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.exists) {
+                duplicateWarning.textContent = '⚠ This movie already exists.';
+                submitButton.disabled = true;
+            } else {
+                duplicateWarning.textContent = '';
+                submitButton.disabled = false;
+            }
+        });
+    };
+});
+
+
+
+
+
+
     const addMovieModal   = addMovieModalEl ? new bootstrap.Modal(addMovieModalEl) : null;
     const tableBody       = document.getElementById("movieTableBody");
 
     if (!addMovieForm || !tableBody) return;
+
+
 
     addMovieForm.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -30,7 +75,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = document.createElement('tr');
                 row.id = 'movie-row-' + movie.Movie_id;
 
-                const fav  = movie.Favorite ? 1 : 0;
+                const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
                 const star = fav ? '★' : '☆';
 
                 row.innerHTML = `
@@ -82,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function showAddSuccessMessage() {
         let msg = document.getElementById('successMessage');
 
-        // if it doesn't exist (because Twig didn't render it), create it
+        
         if (!msg) {
             const container = document.querySelector('.container');
             msg = document.createElement('div');

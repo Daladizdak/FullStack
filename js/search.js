@@ -56,7 +56,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     row.id = 'movie-row-' + movie.Movie_id;
 
                    
-                    const fav  = movie.Favorite ? 1 : 0;
+                    const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
                     const star = fav ? '★' : '☆';
 
                     row.innerHTML = `

@@ -114,6 +114,7 @@
 							<div class="mb-3">
 								<label for="MovieName" class="form-label">Movie Name</label>
 								<input type="text" class="form-control" id="MovieName" name="MovieName" required="">
+								<div id="duplicateWarning" class="text-danger small mb-2"></div>
 					</div>
 							<div class="mb-3">
 								<label for="Genre" class="form-label">Genre</label>
@@ -127,7 +128,7 @@
 								<label for="Score" class="form-label">Score</label>
 								<input type="number" class="form-control" id="Score" name="Score" required="">
 					</div>
-
+					
 					<div class="mb-3">
    						 <label class="form-label" id="addCaptchaQuestion"></label>
 
@@ -141,6 +142,8 @@
     						<input type="hidden" id="addCaptchaA" name="captcha_a">
     						<input type="hidden" id="addCaptchaB" name="captcha_b">
 						</div>
+
+	
 
 							<div id="addError" class="text-danger mb-2"></div>
 							<button type="submit" class="btn btn-primary">Save movie</button>

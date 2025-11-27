@@ -5,7 +5,7 @@
 	include("db.php");
 
 	// Query movies 
-	$query  = "SELECT * FROM films ORDER BY Movie_name";
+	$query  = "SELECT * FROM films ORDER BY Favorite DESC, Movie_name ASC";
 	$result = mysqli_query($mysqli, $query);
 
 	if (!$result) {
