@@ -8,6 +8,19 @@ $genre       = trim($_POST['Genre']       ?? '');
 $releaseDate = trim($_POST['ReleaseDate'] ?? '');
 $score       = trim($_POST['Score']       ?? '');
 
+$captchaA      = isset($_POST['captcha_a']) ? (int)$_POST['captcha_a'] : 0;
+$captchaB      = isset($_POST['captcha_b']) ? (int)$_POST['captcha_b'] : 0;
+$captchaAnswer = isset($_POST['captcha_answer']) ? (int)$_POST['captcha_answer'] : 0;
+
+if ($captchaAnswer !== ($captchaA + $captchaB)) {
+    echo json_encode([
+        'success' => false,
+        'error'   => 'Captcha failed. Please try again.'
+    ]);
+    exit;
+}
+
+
 if ($movieName === '' || $genre === '' || $releaseDate === '' || $score === '') {
     echo json_encode(['success' => false, 'error' => 'All fields are required.']);
     exit;
