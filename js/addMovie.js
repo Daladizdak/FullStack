@@ -3,6 +3,17 @@ document.addEventListener('DOMContentLoaded', () => {
     const addError        = document.getElementById('addError');
     const addMovieModalEl = document.getElementById('addMovieModal');
 
+   function escapeHtml(str) {
+   	 if (str === null || str === undefined) return '';
+   	 return String(str)
+        	.replace(/&/g, '&amp;')
+        	.replace(/</g, '&lt;')
+        	.replace(/>/g, '&gt;')
+        	.replace(/"/g, '&quot;')
+        	.replace(/'/g, '&#039;');
+	}
+
+if (!addMovieForm || !addMovieModalEl) return;
 
 addMovieModalEl.addEventListener("shown.bs.modal", () => {
 
@@ -87,11 +98,16 @@ addMovieModalEl.addEventListener("shown.bs.modal", () => {
 
                 const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
                 const star = fav ? '★' : '☆';
+		const safeName  = escapeHtml(movie.Movie_name);
+    		const safeGenre = escapeHtml(movie.Genre);
+    		const safeDate  = escapeHtml(movie.Release_Date);
+
+
 
                 row.innerHTML = `
-                    <td>${movie.Movie_name}</td>
-                    <td>${movie.Genre}</td>
-                    <td>${movie.Release_Date}</td>
+                    <td>${safeName}</td>
+       		    <td>${safeGenre}</td>
+       		    <td>${safeDate}</td>
                     <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
                     <td class="movie-fav">
                         <button
@@ -106,9 +122,9 @@ addMovieModalEl.addEventListener("shown.bs.modal", () => {
                     <td>
                         <button class="btn btn-sm btn-primary btn-edit"
                             data-id="${movie.Movie_id}"
-                            data-name="${movie.Movie_name}"
-                            data-genre="${movie.Genre}"
-                            data-date="${movie.Release_Date}"
+                            data-name="${safeName}"
+                            data-genre="${safeGenre}"
+                            data-date="${safeDate}"
                             data-score="${movie.Score}">
                             Edit
                         </button>

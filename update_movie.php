@@ -88,37 +88,8 @@ mysqli_stmt_bind_param($stmt, 'sssii',
 );
 
 if (mysqli_stmt_execute($stmt)) {
-
-    $getFavSql = "SELECT Favorite FROM films WHERE Movie_id = ?";
-    $getFav = mysqli_prepare($mysqli, $getFavSql);
-
-     if ($getFav) {
-        mysqli_stmt_bind_param($getFav, 'i', $id);
-        mysqli_stmt_execute($getFav);
-        mysqli_stmt_bind_result($getFav, $fav);
-        mysqli_stmt_fetch($getFav);
-        mysqli_stmt_close($getFav);
-    } else {
-        // default if something weird happens
-        $fav = 0;
-    }
-
-    if ($fav === null) {
-        $fav = 0;
-    }
-
-
-    echo json_encode([
-        'success' => true,
-        'movie' => [
-            'Movie_id'     => $id,
-            'Movie_name'   => $movieName,
-            'Genre'        => $genre,
-            'Release_Date' => $releaseDate,
-            'Score'        => (int)$score,
- 	    'Favorite'     => $fav  
-        ]
-    ]);
+   
+    echo json_encode(['success' => true]);
 } else {
     echo json_encode(['success' => false, 'error' => 'Update failed.']);
 }
