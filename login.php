@@ -12,7 +12,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($username === '' || $password === '') {
         $error = 'Please enter both username and password.';
     } else {
-        // Get row from DB
+        
         $sql = "SELECT id, username, password_hash FROM users WHERE username = ?";
         $stmt = mysqli_prepare($mysqli, $sql);
         mysqli_stmt_bind_param($stmt, 's', $username);
@@ -22,7 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         mysqli_stmt_close($stmt);
 
         if ($user && password_verify($password, $user['password_hash'])) {
-            // secure the session
+            
             session_regenerate_id(true);
             $_SESSION['user_id']  = $user['id'];
             $_SESSION['username'] = $user['username'];

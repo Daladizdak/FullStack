@@ -16,6 +16,8 @@ $movieName   = trim($_POST['MovieName']   ?? '');
 $genre       = trim($_POST['Genre']       ?? '');
 $releaseDate = trim($_POST['ReleaseDate'] ?? '');
 $score       = trim($_POST['Score']       ?? '');
+$movieName = strip_tags($movieName);
+$genre     = strip_tags($genre);
 
 $captchaA      = isset($_POST['captcha_a']) ? (int)$_POST['captcha_a'] : 0;
 $captchaB      = isset($_POST['captcha_b']) ? (int)$_POST['captcha_b'] : 0;

@@ -1,6 +1,6 @@
 <?php
 header('Content-Type: application/json');
-
+require_once __DIR__ . '/security_headers.php';
 include("db.php");
 
 $movieName = isset($_POST['MovieName']) ? trim($_POST['MovieName']) : '';

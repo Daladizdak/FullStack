@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     return;
                 }
 
-                // update star
+                
                 btn.setAttribute('data-fav', data.favorite);
                 btn.textContent = data.favorite ? '★' : '☆';
 
