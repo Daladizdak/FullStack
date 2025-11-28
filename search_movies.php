@@ -1,69 +1,88 @@
 <?php
-	// search_movies.php
-	header('Content-Type: application/json');
 
-	// Get search term from query string (e.g. ?search=abc)
-	$search = isset($_GET['search']) ? trim($_GET['search']) : '';
+header('Content-Type: application/json');
 
-	include("db.php");
+include("db.php");
 
-	//if the search box is empty, All movies will be displayed in order of their name
-	if ($search === '') {
-		$sql = "SELECT * FROM films ORDER BY Favorite DESC, Movie_name ASC";
-		$result = mysqli_query($mysqli, $sql);
 
-		if (!$result) {
-			echo json_encode([]);
-			mysqli_close($mysqli);
-			exit;
-		}
+$search     = trim($_GET['search']     ?? '');
+$genre      = trim($_GET['genre']      ?? '');
+$yearBefore = trim($_GET['year_before'] ?? '');
 
-		$movies = [];
-		while ($row = mysqli_fetch_assoc($result)) {
-			$movies[] = $row;
-		}
 
-		mysqli_free_result($result);
-		mysqli_close($mysqli);
+$sql   = "SELECT * FROM films WHERE 1=1";
+$where = [];
+$params = [];
+$types  = "";
 
-		echo json_encode($movies);
-		exit;
-	}
 
-	// When there *is* a search term, use a prepared statement for more security
-	$sql = "SELECT * FROM films 
-			WHERE Movie_name LIKE ?
-			ORDER BY Favorite DESC, Movie_name ASC";
+if ($search !== '') {
+    $sql    .= " AND Movie_name LIKE ?";
+    $params[] = '%' . $search . '%';
+    $types   .= "s";
+}
 
-	$stmt = mysqli_prepare($mysqli, $sql);
 
-	if (!$stmt) {
-		echo json_encode([]);
-		mysqli_close($mysqli);
-		exit;
-	}
+if ($genre !== '') {
+    $sql    .= " AND Genre LIKE ?";
+    $params[] = '%' . $genre . '%';
+    $types   .= "s";
+}
 
-	
-	$like = '%' . $search . '%';
-	mysqli_stmt_bind_param($stmt, 's', $like);
 
-	// Execute statement
-	mysqli_stmt_execute($stmt);
+if ($yearBefore !== '') {
+    $yearInt = (int)$yearBefore;
+    if ($yearInt > 0) {
+        $sql    .= " AND YEAR(Release_Date) < ?";
+        $params[] = $yearInt;
+        $types   .= "i";
+    }
+}
 
-	// Get result set
-	$result = mysqli_stmt_get_result($stmt);
 
-	$movies = [];
-	if ($result) {
-		while ($row = mysqli_fetch_assoc($result)) {
-			$movies[] = $row;
-		}
-		mysqli_free_result($result);
-	}
+$sql .= " ORDER BY Favorite DESC, Movie_name ASC";
 
-	
-	mysqli_stmt_close($stmt);
-	mysqli_close($mysqli);
+if ($types === "") {
+    
+    $result = mysqli_query($mysqli, $sql);
+    if (!$result) {
+        echo json_encode([]);
+        mysqli_close($mysqli);
+        exit;
+    }
 
-	
-	echo json_encode($movies);
+    $movies = [];
+    while ($row = mysqli_fetch_assoc($result)) {
+        $movies[] = $row;
+    }
+    mysqli_free_result($result);
+    mysqli_close($mysqli);
+    echo json_encode($movies);
+    exit;
+}
+
+
+$stmt = mysqli_prepare($mysqli, $sql);
+if (!$stmt) {
+    echo json_encode([]);
+    mysqli_close($mysqli);
+    exit;
+}
+
+
+mysqli_stmt_bind_param($stmt, $types, ...$params);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+
+$movies = [];
+if ($result) {
+    while ($row = mysqli_fetch_assoc($result)) {
+        $movies[] = $row;
+    }
+    mysqli_free_result($result);
+}
+
+mysqli_stmt_close($stmt);
+mysqli_close($mysqli);
+
+echo json_encode($movies);

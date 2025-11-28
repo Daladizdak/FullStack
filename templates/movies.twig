@@ -12,32 +12,55 @@
 			<h1 class="mb-4">Best Movies Of All time</h1>
 
 			
-			<div class="row mb-3">
-				<div class="col-md-4">
-					<input
-						type="text"
-						class="form-control"
-						id="searchBox"
-						placeholder="Search by movie name or genre">
+<div class="row g-3 align-items-start mb-3">
 
-						
-						<ul id="suggestions" class="list-group mt-1"></ul>
+    
+    <div class="col-md-4">
+        <label for="searchBox" class="form-label">Search by name</label>
+        <input
+            type="text"
+            class="form-control"
+            id="searchBox"
+            placeholder="Movie name...">
 
-						<div id="spinner" class="text-primary my-2" style="display:none;">
-							<div class="spinner-border spinner-border-sm" role="status"></div>
-							<span class="ms-1">Searching…</span>
-						</div>
-						
-					</div>
-			</div>
+        <ul id="suggestions" class="list-group mt-1"></ul>
 
-<div class="col-md-2">
+        <div id="spinner" class="text-primary my-2" style="display:none;">
+            <div class="spinner-border spinner-border-sm" role="status"></div>
+            <span class="ms-1">Searching…</span>
+        </div>
+    </div>
+
+   
+    <div class="col-md-3">
+        <label for="genreFilter" class="form-label">Genre</label>
+        <input
+            type="text"
+            class="form-control"
+            id="genreFilter"
+            placeholder="e.g. War, Comedy">
+    </div>
+
+    
+    <div class="col-md-2">
+        <label for="yearBefore" class="form-label">Before year</label>
+        <input
+            type="number"
+            class="form-control"
+            id="yearBefore"
+            placeholder="e.g. 2020">
+    </div>
+
+    
+    <div class="col-md-3 text-end">
         {% if loggedIn %}
-            <a href="logout.php" class="btn btn-outline-secondary w-100">Logout</a>
+            <a href="logout.php" class="btn btn-outline-secondary">Logout</a>
         {% else %}
-            <a href="login.php" class="btn btn-outline-primary w-100">Login</a>
+            <a href="login.php" class="btn btn-outline-primary">Login</a>
         {% endif %}
     </div>
+
+</div>
 			<table class="table table-striped">
 				<thead>
 					<tr>

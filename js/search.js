@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', () => {
     const searchBox = document.getElementById("searchBox");
     const tableBody = document.getElementById("movieTableBody");
+    const genreFilter  = document.getElementById("genreFilter");
+    const yearBeforeEl = document.getElementById("yearBefore");
     const noResultsMessage = document.getElementById("noResultsMessage");
     const suggestions = document.getElementById("suggestions");
     const spinner = document.getElementById("spinner");
@@ -32,97 +34,97 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function doSearch() {
-        const keywords = searchBox.value;
+function doSearch() {
+    const keywords   = searchBox.value;
+    const genre      = genreFilter ? genreFilter.value.trim() : '';
+    const yearBefore = yearBeforeEl ? yearBeforeEl.value.trim() : '';
 
-        spinner.style.display = 'inline-block';
+    const params = new URLSearchParams();
+    params.append('search', keywords);
 
-        fetch('search_movies.php?search=' + encodeURIComponent(keywords))
-            .then(res => res.json())
-            .then(movies => {
-                spinner.style.display = 'none';
-                tableBody.innerHTML = '';
-
-                if (!movies.length) {
-                    noResultsMessage.style.display = 'block';
-                    clearSuggestions();
-                    return;
-                }
-
-                noResultsMessage.style.display = 'none';
-
-                movies.forEach(movie => {
-                    const row = document.createElement('tr');
-                    row.id = 'movie-row-' + movie.Movie_id;
-
-                   
-                   const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
-const star = fav ? '★' : '☆';
-
-// Favourite cell HTML depends on login
-let favCellHtml;
-if (typeof LOGGED_IN !== 'undefined' && LOGGED_IN) {
-    favCellHtml = `
-        <button
-            type="button"
-            class="btn btn-link btn-sm p-0 btn-fav"
-            data-id="${movie.Movie_id}"
-            data-fav="${fav}"
-        >
-            ${star}
-        </button>
-    `;
-} else {
-    favCellHtml = star; // just show the star, no button
-}
-
-// Adjust (edit/delete) column depends on login
-let adjustCellHtml;
-if (typeof LOGGED_IN !== 'undefined' && LOGGED_IN) {
-    adjustCellHtml = `
-        <button class="btn btn-sm btn-primary btn-edit"
-            data-id="${movie.Movie_id}"
-            data-name="${movie.Movie_name}"
-            data-genre="${movie.Genre}"
-            data-date="${movie.Release_Date}"
-            data-score="${movie.Score}">
-            Edit
-        </button>
-        <button class="btn btn-sm btn-danger btn-delete"
-            data-id="${movie.Movie_id}">
-            Delete
-        </button>
-    `;
-} else {
-    adjustCellHtml = `<span class="text-muted small">Login to edit</span>`;
-}
-
-row.innerHTML = `
-    <td>${movie.Movie_name}</td>
-    <td>${movie.Genre}</td>
-    <td>${movie.Release_Date}</td>
-    <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
-    <td class="movie-fav">
-        ${favCellHtml}
-    </td>
-    <td>
-        ${adjustCellHtml}
-    </td>
-`;
-
-
-                    tableBody.appendChild(row);
-                });
-
-                renderSuggestions(movies);
-            })
-            .catch(() => {
-                spinner.style.display = 'none';
-                clearSuggestions();
-            });
+    if (genre !== '') {
+        params.append('genre', genre);
+    }
+    if (yearBefore !== '') {
+        params.append('year_before', yearBefore);
     }
 
-    searchBox.addEventListener("keyup", doSearch);
+    spinner.style.display = 'inline-block';
+
+    fetch('search_movies.php?' + params.toString())
+        .then(res => res.json())
+        .then(movies => {
+            spinner.style.display = 'none';
+            tableBody.innerHTML = '';
+
+            if (!movies.length) {
+                noResultsMessage.style.display = 'block';
+                clearSuggestions();
+                return;
+            }
+
+            noResultsMessage.style.display = 'none';
+
+            movies.forEach(movie => {
+                const row = document.createElement('tr');
+                row.id = 'movie-row-' + movie.Movie_id;
+
+                const fav  = (parseInt(movie.Favorite ?? 0, 10) === 1) ? 1 : 0;
+                const star = fav ? '★' : '☆';
+
+                row.innerHTML = `
+                    <td>${movie.Movie_name}</td>
+                    <td>${movie.Genre}</td>
+                    <td>${movie.Release_Date}</td>
+                    <td class="movie-score">${parseInt(movie.Score, 10)}/100</td>
+                    <td class="movie-fav">
+                        ${
+                            (typeof LOGGED_IN !== 'undefined' && (LOGGED_IN === true || LOGGED_IN === 'true'))
+                            ? `<button
+                                    type="button"
+                                    class="btn btn-link btn-sm p-0 btn-fav"
+                                    data-id="${movie.Movie_id}"
+                                    data-fav="${fav}">
+                                    ${star}
+                               </button>`
+                            : star
+                        }
+                    </td>
+                    <td>
+                        ${
+                            (typeof LOGGED_IN !== 'undefined' && (LOGGED_IN === true || LOGGED_IN === 'true'))
+                            ? `<button class="btn btn-sm btn-primary btn-edit"
+                                        data-id="${movie.Movie_id}"
+                                        data-name="${movie.Movie_name}"
+                                        data-genre="${movie.Genre}"
+                                        data-date="${movie.Release_Date}"
+                                        data-score="${movie.Score}">
+                                    Edit
+                               </button>
+                               <button class="btn btn-sm btn-danger btn-delete"
+                                        data-id="${movie.Movie_id}">
+                                    Delete
+                               </button>`
+                            : `<span class="text-muted small">Login to edit</span>`
+                        }
+                    </td>
+                `;
+
+                tableBody.appendChild(row);
+            });
+
+            renderSuggestions(movies);
+        })
+        .catch(() => {
+            spinner.style.display = 'none';
+            clearSuggestions();
+        });
+}
+
+
+        searchBox.addEventListener("keyup", doSearch);
+	if (genreFilter)  genreFilter.addEventListener("keyup", doSearch);
+	if (yearBeforeEl) yearBeforeEl.addEventListener("keyup", doSearch);
 
     document.addEventListener('click', (e) => {
         if (!searchBox.contains(e.target) && !suggestions.contains(e.target)) {
